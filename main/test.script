@@ -1,23 +1,48 @@
-local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data"
-local file_name = "points"
+local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
+local file_track_1_name = "track_1.txt"
+local file_track_2_name = "track_2.txt"
+local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*)"
 
-local points
-local index = 1
+local car_1 = "/go1"
+local car_2 = "/go2"
+
+local track_1 = {}
+local track_2 = {}
+local index_1 = 1
+local index_2 = 100
 local time = 0
 
 function init(self)
-	local path = sys.get_save_file(file_path, file_name)
-	 points = sys.load(path)
+	local path = file_path .. file_track_1_name
+	local file = io.open(path)
+	for line in io.lines(path) do
+		local a, x, y, track = line:match(match_pattern)
+		local id = tonumber(a)
+		track_1[id] = {position = vmath.vector3(x, y, 0)}
+	end
+	file:close()
+	path = file_path .. file_track_2_name
+	file = io.open(path)
+	for line in io.lines(path) do
+		local a, x, y, track = line:match(match_pattern)
+		local id = tonumber(a)
+		track_2[id] = {position = vmath.vector3(x, y, 0)}
+	end
+	file:close()
+end
+
+local function move_car(track, index, car)
+	index = index + 1
+	if index > #track then index = 1 end
+	local new_position = track[index].position
+	go.set_position(new_position, car)
+	return index
 end
 
 function update(self, dt)
 	time = time + dt
-	if time > .00001 then 
-		time = 0
-		local position = points[index]
-		go.set_position(vmath.vector3(position.x, position.y, 0), "/go1")
-		print(go.get_position("/go1"))
-		index = index + 1
-		if index > #points then index = 1 end
+	if time > .01 then
+		index_1 = move_car(track_1, index_1, car_1)
+		index_2 = move_car(track_2, index_2, car_2)
 	end
 end
