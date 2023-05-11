@@ -1,3 +1,6 @@
+go.property("car_speed", 1000)
+go.property("track_speed", 1)
+
 local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
 local file_track_1_name = "track_1.txt"
 local file_track_2_name = "track_2.txt"
@@ -12,42 +15,45 @@ local index_1 = 1
 local index_2 = 100
 local time = 0
 
-function init(self)
-	local path = file_path .. file_track_1_name
-	local file = io.open(path)
-	for line in io.lines(path) do
-		local a, x, y, track = line:match(match_pattern)
-		local id = tonumber(a)
-		track_1[id] = {position = vmath.vector3(x, y, 0)}
-	end
-	file:close()
-	path = file_path .. file_track_2_name
+local car_1_moved = true
+local car_1_speed
+local car_2_moved = true
+local car_2_speed
+local track_speed
+
+
+local function init_track(track, path)
 	file = io.open(path)
 	for line in io.lines(path) do
-		local a, x, y, track = line:match(match_pattern)
+		local a, x, y, track_number = line:match(match_pattern)
 		local id = tonumber(a)
-		track_2[id] = {position = vmath.vector3(x, y, 0)}
+		track[id] = {position = vmath.vector3(x, y, 0)}
 	end
 	file:close()
 end
 
-local car_1_moved = true
-local car_1_speed = 5000
+function init(self)
+	track_speed = self.track_speed
+	car_1_speed = self.car_speed
+	car_2_speed = self.car_speed
+	local path = file_path .. file_track_1_name
+	init_track(track_1, path)
+	path = file_path .. file_track_2_name
+	init_track(track_2, path)
 
-local function moved()
-	car_1_moved = true
 end
 
-local function move_car(track, index, car, car_speed, callback)
+local function car_1_callback() car_1_moved = true end
+local function car_2_callback()car_2_moved = true end
+
+local function move_car(track, index, car, current_track_speed, car_speed, callback)
 	local current_position = track[index].position
-	car_1_moved = false
-	index = index + car_speed
+	index = index + current_track_speed
 	if index > #track then index = 1 end
 	local target_position = track[index].position
 	local distance = vmath.length(target_position - current_position)
-	local duration = distance / car_1_speed
-	--go.set_position(new_position, car)
-	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_OUTSINE, duration, 0, callback) -- <8>
+	local duration = distance / car_speed
+	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_OUTSINE, duration, 0, callback)
 	return index
 end
 
@@ -60,12 +66,12 @@ end
 
 function update(self, dt)
 	time = time + dt
-	--if time > .1 then
-	--	index_1 = move_car(track_1, index_1, car_1, 1)
-	--	index_2 = move_car(track_2, index_2, car_2, 5)
-	--	time = 0
-	--end
-	if car_1_moved == true then 
-		index_1 = move_car(track_1, index_1, car_1, 1, moved)
+	if car_1_moved == true then
+		car_1_moved = false
+		index_1 = move_car(track_1, index_1, car_1, track_speed, car_1_speed, car_1_callback)
+	end
+	if car_2_moved == true then
+		car_2_moved = false
+		index_2 = move_car(track_2, index_2, car_2, track_speed, car_2_speed, car_2_callback)
 	end
 end
