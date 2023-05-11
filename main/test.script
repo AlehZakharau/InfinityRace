@@ -1,6 +1,7 @@
 go.property("car_speed", 1000)
 go.property("track_speed", 1)
 go.property("track_stage_duration", 100)
+go.property("boost_speed", 2)
 
 local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
 local file_track_1_name = "track_1.txt"
@@ -23,6 +24,7 @@ local car_2_speed
 
 
 local function init_track(track, path)
+	msg.post(".", "acquire_input_focus")
 	file = io.open(path)
 	for line in io.lines(path) do
 		local a, x, y, track_number = line:match(match_pattern)
@@ -76,5 +78,14 @@ function update(self, dt)
 	if car_2_moved == true then
 		car_2_moved = false
 		index_2 = move_car(track_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
+	end
+end
+
+local function end_speed_boost() car_1_speed = car_1_speed * 0.5 end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") and action.released then
+		car_1_speed = car_1_speed * self.boost_speed
+		timer.delay(2, false, end_speed_boost)
 	end
 end
