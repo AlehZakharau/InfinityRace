@@ -31,18 +31,41 @@ function init(self)
 	file:close()
 end
 
-local function move_car(track, index, car)
-	index = index + 1
+local car_1_moved = true
+local car_1_speed = 5000
+
+local function moved()
+	car_1_moved = true
+end
+
+local function move_car(track, index, car, car_speed, callback)
+	local current_position = track[index].position
+	car_1_moved = false
+	index = index + car_speed
 	if index > #track then index = 1 end
-	local new_position = track[index].position
-	go.set_position(new_position, car)
+	local target_position = track[index].position
+	local distance = vmath.length(target_position - current_position)
+	local duration = distance / car_1_speed
+	--go.set_position(new_position, car)
+	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_OUTSINE, duration, 0, callback) -- <8>
 	return index
+end
+
+local function switch_track()
+	-- switch index
+	-- change track
+	-- move to connect index
+	-- lick opponent
 end
 
 function update(self, dt)
 	time = time + dt
-	if time > .01 then
-		index_1 = move_car(track_1, index_1, car_1)
-		index_2 = move_car(track_2, index_2, car_2)
+	--if time > .1 then
+	--	index_1 = move_car(track_1, index_1, car_1, 1)
+	--	index_2 = move_car(track_2, index_2, car_2, 5)
+	--	time = 0
+	--end
+	if car_1_moved == true then 
+		index_1 = move_car(track_1, index_1, car_1, 1, moved)
 	end
 end
