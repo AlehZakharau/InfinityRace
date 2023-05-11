@@ -1,5 +1,6 @@
 go.property("car_speed", 1000)
 go.property("track_speed", 1)
+go.property("track_stage_duration", 100)
 
 local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
 local file_track_1_name = "track_1.txt"
@@ -19,7 +20,6 @@ local car_1_moved = true
 local car_1_speed
 local car_2_moved = true
 local car_2_speed
-local track_speed
 
 
 local function init_track(track, path)
@@ -33,7 +33,6 @@ local function init_track(track, path)
 end
 
 function init(self)
-	track_speed = self.track_speed
 	car_1_speed = self.car_speed
 	car_2_speed = self.car_speed
 	local path = file_path .. file_track_1_name
@@ -66,12 +65,16 @@ end
 
 function update(self, dt)
 	time = time + dt
+	if time > self.track_stage_duration and self.track_speed < 5 then
+		self.track_speed = self.track_speed + 1
+		time = 0
+	end
 	if car_1_moved == true then
 		car_1_moved = false
-		index_1 = move_car(track_1, index_1, car_1, track_speed, car_1_speed, car_1_callback)
+		index_1 = move_car(track_1, index_1, car_1, self.track_speed, car_1_speed, car_1_callback)
 	end
 	if car_2_moved == true then
 		car_2_moved = false
-		index_2 = move_car(track_2, index_2, car_2, track_speed, car_2_speed, car_2_callback)
+		index_2 = move_car(track_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
 	end
 end
