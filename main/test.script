@@ -1,12 +1,14 @@
 go.property("car_speed", 1000)
 go.property("track_speed", 1)
+go.property("max_track_speed", 5)
 go.property("track_stage_duration", 100)
 go.property("boost_speed", 2)
+go.property("boost_duration", 0.5)
 
 local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
 local file_track_1_name = "track_1.txt"
 local file_track_2_name = "track_2.txt"
-local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*)"
+local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)"
 
 local car_1 = "/go1"
 local car_2 = "/go2"
@@ -22,14 +24,18 @@ local car_1_speed
 local car_2_moved = true
 local car_2_speed
 
+local current_track_car_1
+local current_track_index_1
+local current_track_car_2
+local current_track_index_2
 
 local function init_track(track, path)
 	msg.post(".", "acquire_input_focus")
 	file = io.open(path)
 	for line in io.lines(path) do
-		local a, x, y, track_number = line:match(match_pattern)
+		local a, x, y, switcher_status, connector_index = line:match(match_pattern)
 		local id = tonumber(a)
-		track[id] = {position = vmath.vector3(x, y, 0)}
+		track[id] = {position = vmath.vector3(x, y, 0), switcher = tonumber(switcher_status), connector = tonumber(connector_index)}
 	end
 	file:close()
 end
@@ -39,8 +45,12 @@ function init(self)
 	car_2_speed = self.car_speed
 	local path = file_path .. file_track_1_name
 	init_track(track_1, path)
+	current_track_car_1 = track_1
+	current_track_index_1 = 1
 	path = file_path .. file_track_2_name
 	init_track(track_2, path)
+	current_track_car_2 = track_2
+	current_track_index_2 = 2
 
 end
 
@@ -71,8 +81,23 @@ local function move_car(track, index, car, current_track_speed, car_speed, callb
 	return next_index
 end
 
-local function switch_track()
-	-- switch index
+local function switch_track(track, index, track_index)
+	print(track[index].switcher)
+	if track[index].switcher == 1 then
+		print("switch track ".. index.. "::".. track[index].connector)
+		if track_index == 1 then
+			index = track[index].connector - #track
+			track = track_2
+			track_index = 2
+			return track, index, track_index
+		else
+			index = track[index].connector - #track
+			track = track_1
+			track_index = 1
+			return track, index, track_index
+		end
+	end
+	return track, index, track_index
 	-- change track
 	-- move to connect index
 	-- lick opponent
@@ -80,17 +105,17 @@ end
 
 function update(self, dt)
 	time = time + dt
-	if time > self.track_stage_duration and self.track_speed < 5 then
+	if time > self.track_stage_duration and self.track_speed < self.max_track_speed then
 		self.track_speed = self.track_speed + 1
 		time = 0
 	end
 	if car_1_moved == true then
 		car_1_moved = false
-		index_1 = move_car(track_1, index_1, car_1, self.track_speed, car_1_speed, car_1_callback)
+		index_1 = move_car(current_track_car_1, index_1, car_1, self.track_speed, car_1_speed, car_1_callback)
 	end
 	if car_2_moved == true then
 		car_2_moved = false
-		index_2 = move_car(track_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
+		index_2 = move_car(current_track_car_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
 	end
 	rotate_car(car_1, current_track_car_1, index_1, self.track_speed)
 	rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
@@ -99,8 +124,14 @@ end
 local function end_speed_boost() car_1_speed = car_1_speed * 0.5 end
 
 function on_input(self, action_id, action)
-	if action_id == hash("touch") and action.released then
+	if action_id == hash("boost_car_1") and action.released then
 		car_1_speed = car_1_speed * self.boost_speed
-		timer.delay(2, false, end_speed_boost)
+		timer.delay(self.boost_duration, false, end_speed_boost)
+	end
+	if action_id == hash("switch_track_1") and action.pressed then
+		current_track_car_1, index_1, current_track_index_1 = switch_track(current_track_car_1, index_1, current_track_index_1)
+	end
+	if action_id == hash("switch_track_2") then
+		current_track_car_2, index_2, current_track_index_2 = switch_track(current_track_car_2, index_2, current_track_index_2)
 	end
 end
