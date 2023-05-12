@@ -86,12 +86,12 @@ local function switch_track(track, index, track_index)
 	if track[index].switcher == 1 then
 		print("switch track ".. index.. "::".. track[index].connector)
 		if track_index == 1 then
-			index = track[index].connector - #track
+			index = track[index].connector
 			track = track_2
 			track_index = 2
 			return track, index, track_index
 		else
-			index = track[index].connector - #track
+			index = track[index].connector
 			track = track_1
 			track_index = 1
 			return track, index, track_index
