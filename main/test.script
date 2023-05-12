@@ -47,15 +47,28 @@ end
 local function car_1_callback() car_1_moved = true end
 local function car_2_callback()car_2_moved = true end
 
+local function increment_index(index, track_length, current_track_speed)
+	local next_index = index + current_track_speed
+	if next_index > track_length then next_index = 1 end
+	return next_index
+end
+
+local function rotate_car(car, track, index, current_track_speed)
+	local current_position = go.get_position(car)
+	local next_index = increment_index(index, #track, current_track_speed)
+	local target_position = track[next_index].position
+	local angle = math.atan2(current_position.x - target_position.x, target_position.y - current_position.y)
+	go.set_rotation(vmath.quat_rotation_z(angle), car)
+end
+
 local function move_car(track, index, car, current_track_speed, car_speed, callback)
 	local current_position = track[index].position
-	index = index + current_track_speed
-	if index > #track then index = 1 end
-	local target_position = track[index].position
+	local next_index = increment_index(index, #track, current_track_speed)
+	local target_position = track[next_index].position
 	local distance = vmath.length(target_position - current_position)
 	local duration = distance / car_speed
-	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_OUTSINE, duration, 0, callback)
-	return index
+	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0, callback)
+	return next_index
 end
 
 local function switch_track()
@@ -79,6 +92,8 @@ function update(self, dt)
 		car_2_moved = false
 		index_2 = move_car(track_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
 	end
+	rotate_car(car_1, current_track_car_1, index_1, self.track_speed)
+	rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
 end
 
 local function end_speed_boost() car_1_speed = car_1_speed * 0.5 end
