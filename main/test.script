@@ -80,14 +80,7 @@ function init(self)
 	car_1_active, car_2_active = true, true
 end
 
-
-local function enable_car_1() car_1_active = true end
-local function enable_car_2() car_2_active = true end
-
 local bonus_respawn_index_1, bonus_respawn_index_2
-
-local function respawn_bonus_1() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end
-local function respawn_bonus_2() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end
 
 local function check_car_position()
 	if current_track_index_1 == current_track_index_2 and math.abs((index_1 - index_2) - (track_speed - 1)) < 2 then
@@ -103,12 +96,12 @@ local function car_1_callback()
 		if check_car_position() == true  and index_1 < index_2 and car_1_active == true then
 			car_2_active = false
 			car_2_moved = true
-			timer.delay(3, false, enable_car_2)
+			timer.delay(3, false, function() car_2_active = true end)
 		end
 		if current_track_car_1[index_1].bonus > 0 then
 			bonus_respawn_index_1 = index_1
 			current_track_car_1[index_1].bonus = 0
-			timer.delay(3, false, respawn_bonus_1)
+			timer.delay(3, false, function() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end)
 			print("bonus")
 		end
 	end
@@ -119,12 +112,16 @@ local function car_2_callback()
 		if check_car_position() == true  and index_1 > index_2 and car_2_active == true then
 			car_1_active = false
 			car_1_moved = true
-			timer.delay(3, false, enable_car_1)
+			timer.delay(3, false, function()
+				car_1_active = true
+			end)
 		end
 		if current_track_car_2[index_2].bonus == 1 then
 			bonus_respawn_index_2 = index_2
 			current_track_car_2[index_2].bonus = 0
-			timer.delay(3, false, respawn_bonus_2)
+			timer.delay(3, false, function()
+				current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus()
+			end)
 			print("bonus")
 		end
 	end
