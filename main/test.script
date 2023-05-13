@@ -14,31 +14,30 @@ local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)"
 local car_1 = "/go1"
 local car_2 = "/go2"
 
-local track_1 = {}
-local track_2 = {}
-local index_1 = 1
-local index_2 = 100
+local track_1, track_2 = {}, {}
+local index_1, index_2 = 1, 100
 local track_speed
 local time = 0
 
-local car_1_moved = true
-local car_1_active = false
-local car_1_speed
-local car_2_moved = true
-local car_2_active = false
-local car_2_speed
+local car_1_moved, car_2_moved = true, true
+local car_1_active, car_2_active = false, false
+local car_1_speed, car_2_speed
 
 local boost_delay
 local boost_duration
 local boost_speed
-local boost_1 = false
-local boost_2 = false
+local boost_1, boost_2 = false, false
 
-local current_track_car_1
-local current_track_index_1
-local current_track_car_2
-local current_track_index_2
+local current_track_car_1, current_track_car_2
+local current_track_index_1, current_track_index_2
 
+local function activate_track_speed_timer(self)
+	timer.delay(self.track_stage_duration, true, function()
+		if track_speed < self.max_track_speed then
+			track_speed = track_speed + 1
+		end
+	end)
+end
 
 local function spawn_bonus()
 	return math.random(1, 5)
@@ -76,6 +75,7 @@ function init(self)
 	boost_speed, boost_delay, boost_duration = self.boost_speed, self.boost_delay, self.boost_duration
 
 	initialize_tracks()
+	activate_track_speed_timer(self)
 
 	car_1_active, car_2_active = true, true
 end
@@ -84,15 +84,10 @@ end
 local function enable_car_1() car_1_active = true end
 local function enable_car_2() car_2_active = true end
 
-local bonus_respawn_index_1
-local bonus_respawn_index_2
+local bonus_respawn_index_1, bonus_respawn_index_2
 
-local function respawn_bonus_1()
-	current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus()
-end
-local function respawn_bonus_2()
-	current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus()
-end
+local function respawn_bonus_1() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end
+local function respawn_bonus_2() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end
 
 local function check_car_position()
 	if current_track_index_1 == current_track_index_2 and math.abs((index_1 - index_2) - (track_speed - 1)) < 2 then
@@ -179,10 +174,6 @@ end
 
 function update(self, dt)
 	time = time + dt
-	if time > self.track_stage_duration and track_speed < self.max_track_speed then
-		track_speed = track_speed + 1
-		time = 0
-	end
 	if car_1_moved == true and car_1_active == true then
 		car_1_moved = false
 		index_1 = move_car(current_track_car_1, index_1, car_1, track_speed, car_1_speed, car_1_callback)
