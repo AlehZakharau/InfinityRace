@@ -65,21 +65,35 @@ function init(self)
 	init_track(track_2, path)
 	current_track_car_2 = track_2
 	current_track_index_2 = 2
+
+	car_1_active, car_2_active = true, true
 end
 
-local function kick_opponent(index)
-	if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 3 then
-		print("kick")
-	end
-end
+
+local function enable_car_1() car_1_active = true end
+local function enable_car_2() car_2_active = true end
 
 local function car_1_callback()
-	car_1_moved = true
-	kick_opponent(index_1)
+	if car_1_active == true then
+		car_1_moved = true
+		if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 2 and index_1 < index_2 and
+		car_1_active == true then
+			car_2_active = false
+			car_2_moved = true
+			timer.delay(3, false, enable_car_2)
+		end
+	end
 end
 local function car_2_callback()
-	car_2_moved = true
-	kick_opponent(index_2)
+	if car_2_active == true then
+		car_2_moved = true
+		if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 2 and index_1 < index_2 and
+				car_1_active == true then
+			car_1_active = false
+			car_1_moved = true
+			timer.delay(3, false, enable_car_1)
+		end
+	end
 end
 
 local function increment_index(index, track_length, current_track_speed)
@@ -130,16 +144,20 @@ function update(self, dt)
 		self.track_speed = self.track_speed + 1
 		time = 0
 	end
-	if car_1_moved == true then
+	if car_1_moved == true and car_1_active == true then
 		car_1_moved = false
 		index_1 = move_car(current_track_car_1, index_1, car_1, self.track_speed, car_1_speed, car_1_callback)
 	end
-	if car_2_moved == true then
+	if car_2_moved == true and car_2_active == true then
 		car_2_moved = false
 		index_2 = move_car(current_track_car_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
 	end
-	rotate_car(car_1, current_track_car_1, index_1, self.track_speed)
-	rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
+	if car_1_active == true then
+		rotate_car(car_1, current_track_car_1, index_1, self.track_speed)
+	end
+	if car_2_active == true then
+		rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
+	end
 end
 
 local function enable_speed_boost_1() boost_1 = false  end
