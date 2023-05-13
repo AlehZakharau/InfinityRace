@@ -4,6 +4,7 @@ go.property("max_track_speed", 5)
 go.property("track_stage_duration", 100)
 go.property("boost_speed", 2)
 go.property("boost_duration", 0.5)
+go.property("boost_delay", 3)
 
 local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
 local file_track_1_name = "track_1.txt"
@@ -20,9 +21,17 @@ local index_2 = 100
 local time = 0
 
 local car_1_moved = true
+local car_1_active = false
 local car_1_speed
 local car_2_moved = true
+local car_2_active = false
 local car_2_speed
+
+local boost_delay
+local boost_duration
+local boost_speed
+local boost_1 = false
+local boost_2 = false
 
 local current_track_car_1
 local current_track_index_1
@@ -43,6 +52,11 @@ end
 function init(self)
 	car_1_speed = self.car_speed
 	car_2_speed = self.car_speed
+	boost_speed = self.boost_speed
+	boost_delay = self.boost_delay
+	boost_duration = self.boost_duration
+
+
 	local path = file_path .. file_track_1_name
 	init_track(track_1, path)
 	current_track_car_1 = track_1
@@ -51,11 +65,22 @@ function init(self)
 	init_track(track_2, path)
 	current_track_car_2 = track_2
 	current_track_index_2 = 2
-
 end
 
-local function car_1_callback() car_1_moved = true end
-local function car_2_callback()car_2_moved = true end
+local function kick_opponent(index)
+	if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 3 then
+		print("kick")
+	end
+end
+
+local function car_1_callback()
+	car_1_moved = true
+	kick_opponent(index_1)
+end
+local function car_2_callback()
+	car_2_moved = true
+	kick_opponent(index_2)
+end
 
 local function increment_index(index, track_length, current_track_speed)
 	local next_index = index + current_track_speed
@@ -81,10 +106,9 @@ local function move_car(track, index, car, current_track_speed, car_speed, callb
 	return next_index
 end
 
+
 local function switch_track(track, index, track_index)
-	print(track[index].switcher)
 	if track[index].switcher == 1 then
-		print("switch track ".. index.. "::".. track[index].connector)
 		if track_index == 1 then
 			index = track[index].connector
 			track = track_2
@@ -98,9 +122,6 @@ local function switch_track(track, index, track_index)
 		end
 	end
 	return track, index, track_index
-	-- change track
-	-- move to connect index
-	-- lick opponent
 end
 
 function update(self, dt)
@@ -121,17 +142,31 @@ function update(self, dt)
 	rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
 end
 
-local function end_speed_boost() car_1_speed = car_1_speed * 0.5 end
+local function enable_speed_boost_1() boost_1 = false  end
+local function enable_speed_boost_2() boost_2 = false  end
+local function end_speed_boost_1() car_1_speed = car_1_speed / boost_speed end
+local function end_speed_boost_2() car_2_speed = car_2_speed / boost_speed end
+
+
+local function boost(car_speed, boost_status, boost_callback, enable_boost_callback)
+	car_speed = car_speed * boost_speed
+	boost_status = true
+	timer.delay(boost_duration, false, boost_callback)
+	timer.delay(boost_delay, false, enable_boost_callback)
+	return car_speed, boost_status
+end
 
 function on_input(self, action_id, action)
-	if action_id == hash("boost_car_1") and action.released then
-		car_1_speed = car_1_speed * self.boost_speed
-		timer.delay(self.boost_duration, false, end_speed_boost)
+	if action_id == hash("boost_car_1") and action.released and boost_1 == false then
+		car_1_speed, boost_1 = boost(car_1_speed, boost_1, end_speed_boost_1, enable_speed_boost_1)
+	end
+	if action_id == hash("boost_car_2") and action.released and boost_2 == false then
+		car_2_speed, boost_2 = boost(car_2_speed, boost_2, end_speed_boost_2, enable_speed_boost_2)
 	end
 	if action_id == hash("switch_track_1") and action.pressed then
 		current_track_car_1, index_1, current_track_index_1 = switch_track(current_track_car_1, index_1, current_track_index_1)
 	end
-	if action_id == hash("switch_track_2") then
+	if action_id == hash("switch_track_2") and action.pressed then
 		current_track_car_2, index_2, current_track_index_2 = switch_track(current_track_car_2, index_2, current_track_index_2)
 	end
 end
