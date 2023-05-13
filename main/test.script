@@ -18,6 +18,7 @@ local track_1 = {}
 local track_2 = {}
 local index_1 = 1
 local index_2 = 100
+local track_speed
 local time = 0
 
 local car_1_moved = true
@@ -38,33 +39,43 @@ local current_track_index_1
 local current_track_car_2
 local current_track_index_2
 
-local function init_track(track, path)
+
+local function spawn_bonus()
+	return math.random(1, 5)
+end
+
+local function initialize_track(track, path)
 	msg.post(".", "acquire_input_focus")
 	file = io.open(path)
 	for line in io.lines(path) do
-		local a, x, y, switcher_status, connector_index = line:match(match_pattern)
+		local a, x, y, switcher_status, connector_index, bonus_status = line:match(match_pattern)
 		local id = tonumber(a)
-		track[id] = {position = vmath.vector3(x, y, 0), switcher = tonumber(switcher_status), connector = tonumber(connector_index)}
+		track[id] = {position = vmath.vector3(x, y, 0), switcher = tonumber(switcher_status),
+					 connector = tonumber(connector_index), bonus = tonumber(bonus_status)}
+		if tonumber(bonus_status) == 1 then
+			track[id].bonus = spawn_bonus()
+		end
 	end
 	file:close()
 end
 
-function init(self)
-	car_1_speed = self.car_speed
-	car_2_speed = self.car_speed
-	boost_speed = self.boost_speed
-	boost_delay = self.boost_delay
-	boost_duration = self.boost_duration
-
-
+local function initialize_tracks()
 	local path = file_path .. file_track_1_name
-	init_track(track_1, path)
+	initialize_track(track_1, path)
 	current_track_car_1 = track_1
 	current_track_index_1 = 1
 	path = file_path .. file_track_2_name
-	init_track(track_2, path)
+	initialize_track(track_2, path)
 	current_track_car_2 = track_2
 	current_track_index_2 = 2
+end
+
+function init(self)
+	track_speed = self.track_speed
+	car_1_speed, car_2_speed = self.car_speed, self.car_speed
+	boost_speed, boost_delay, boost_duration = self.boost_speed, self.boost_delay, self.boost_duration
+
+	initialize_tracks()
 
 	car_1_active, car_2_active = true, true
 end
@@ -73,25 +84,53 @@ end
 local function enable_car_1() car_1_active = true end
 local function enable_car_2() car_2_active = true end
 
+local bonus_respawn_index_1
+local bonus_respawn_index_2
+
+local function respawn_bonus_1()
+	current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus()
+end
+local function respawn_bonus_2()
+	current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus()
+end
+
+local function check_car_position()
+	if current_track_index_1 == current_track_index_2 and math.abs((index_1 - index_2) - (track_speed - 1)) < 2 then
+		return true
+	else
+		return false
+	end
+end
+
 local function car_1_callback()
 	if car_1_active == true then
 		car_1_moved = true
-		if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 2 and index_1 < index_2 and
-		car_1_active == true then
+		if check_car_position() == true  and index_1 < index_2 and car_1_active == true then
 			car_2_active = false
 			car_2_moved = true
 			timer.delay(3, false, enable_car_2)
+		end
+		if current_track_car_1[index_1].bonus > 0 then
+			bonus_respawn_index_1 = index_1
+			current_track_car_1[index_1].bonus = 0
+			timer.delay(3, false, respawn_bonus_1)
+			print("bonus")
 		end
 	end
 end
 local function car_2_callback()
 	if car_2_active == true then
 		car_2_moved = true
-		if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 2 and index_1 < index_2 and
-				car_1_active == true then
+		if check_car_position() == true  and index_1 > index_2 and car_2_active == true then
 			car_1_active = false
 			car_1_moved = true
 			timer.delay(3, false, enable_car_1)
+		end
+		if current_track_car_2[index_2].bonus == 1 then
+			bonus_respawn_index_2 = index_2
+			current_track_car_2[index_2].bonus = 0
+			timer.delay(3, false, respawn_bonus_2)
+			print("bonus")
 		end
 	end
 end
@@ -140,23 +179,23 @@ end
 
 function update(self, dt)
 	time = time + dt
-	if time > self.track_stage_duration and self.track_speed < self.max_track_speed then
-		self.track_speed = self.track_speed + 1
+	if time > self.track_stage_duration and track_speed < self.max_track_speed then
+		track_speed = track_speed + 1
 		time = 0
 	end
 	if car_1_moved == true and car_1_active == true then
 		car_1_moved = false
-		index_1 = move_car(current_track_car_1, index_1, car_1, self.track_speed, car_1_speed, car_1_callback)
+		index_1 = move_car(current_track_car_1, index_1, car_1, track_speed, car_1_speed, car_1_callback)
 	end
 	if car_2_moved == true and car_2_active == true then
 		car_2_moved = false
-		index_2 = move_car(current_track_car_2, index_2, car_2, self.track_speed, car_2_speed, car_2_callback)
+		index_2 = move_car(current_track_car_2, index_2, car_2, track_speed, car_2_speed, car_2_callback)
 	end
 	if car_1_active == true then
-		rotate_car(car_1, current_track_car_1, index_1, self.track_speed)
+		rotate_car(car_1, current_track_car_1, index_1, track_speed)
 	end
 	if car_2_active == true then
-		rotate_car(car_2, current_track_car_2, index_2, self.track_speed)
+		rotate_car(car_2, current_track_car_2, index_2, track_speed)
 	end
 end
 
