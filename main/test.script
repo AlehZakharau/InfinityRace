@@ -6,9 +6,10 @@ go.property("boost_speed", 2)
 go.property("boost_duration", 0.5)
 go.property("boost_delay", 3)
 
-local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
-local file_track_1_name = "track_1.txt"
-local file_track_2_name = "track_2.txt"
+--local file_path = "/Users/alehzakharau/Documents/Defold/Projects/InfinityRace/data/"
+local file_track_1_name = "/data/track_1.txt"
+local file_track_2_name = "/data/track_2.txt"
+local line_match_pattern = "([^\n]+)"
 local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)"
 
 local car_1 = "/go1"
@@ -46,9 +47,8 @@ local function spawn_bonus()
 end
 
 local function initialize_track(track, path)
-	msg.post(".", "acquire_input_focus")
-	file = io.open(path)
-	for line in io.lines(path) do
+	local data = sys.load_resource(path)
+	for line in data:gmatch(line_match_pattern) do
 		local a, x, y, switcher_status, connector_index, bonus_status = line:match(match_pattern)
 		local id = tonumber(a)
 		track[id] = {position = vmath.vector3(x, y, 0), switcher = tonumber(switcher_status),
@@ -57,16 +57,15 @@ local function initialize_track(track, path)
 			track[id].bonus = spawn_bonus()
 		end
 	end
-	file:close()
 end
 
 local function initialize_tracks()
-	local path = file_path .. file_track_1_name
-	initialize_track(track_1, path)
+	--local path = file_path .. file_track_1_name
+	initialize_track(track_1, file_track_1_name)
 	current_track_car_1 = track_1
 	current_track_index_1 = 1
-	path = file_path .. file_track_2_name
-	initialize_track(track_2, path)
+	--path = file_path .. file_track_2_name
+	initialize_track(track_2, file_track_2_name)
 	current_track_car_2 = track_2
 	current_track_index_2 = 2
 end
@@ -79,6 +78,7 @@ function init(self)
 	initialize_tracks()
 	activate_track_speed_timer(self)
 
+	msg.post(".", "acquire_input_focus")
 	car_1_active, car_2_active = true, true
 end
 

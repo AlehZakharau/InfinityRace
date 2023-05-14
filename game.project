@@ -13,4 +13,5 @@ input_method = HiddenInputField
 
 [project]
 title = InfinityRace
+custom_resources = /data/track_1.txt, /data/track_2.txt
 
