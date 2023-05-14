@@ -1,0 +1,58 @@
+go.property("bonus_index", 0)
+
+go.property("decrease_icon",resource.atlas("/assets/track.atlas"))
+go.property("get_stuck_icon",resource.atlas("/assets/track.atlas"))
+go.property("increase_icon",resource.atlas("/assets/track.atlas"))
+go.property("lap_icon",resource.atlas("/assets/track.atlas"))
+go.property("rocket_icon",resource.atlas("/assets/track.atlas"))
+
+function init(self)
+    if self.bonus_index == 1 then
+        msg.post("#sprite1", "disable")
+        msg.post("#sprite2", "disable")
+        msg.post("#sprite3", "disable")
+        msg.post("#sprite4", "disable")
+    elseif self.bonus_index == 2 then
+        msg.post("#sprite", "disable")
+        msg.post("#sprite2", "disable")
+        msg.post("#sprite3", "disable")
+        msg.post("#sprite4", "disable")
+    elseif self.bonus_index == 3 then
+        msg.post("#sprite", "disable")
+        msg.post("#sprite1", "disable")
+        msg.post("#sprite3", "disable")
+        msg.post("#sprite4", "disable")
+    elseif self.bonus_index == 4 then
+        msg.post("#sprite", "disable")
+        msg.post("#sprite1", "disable")
+        msg.post("#sprite2", "disable")
+        msg.post("#sprite4", "disable")
+    elseif self.bonus_index == 5 then
+        msg.post("#sprite", "disable")
+        msg.post("#sprite1", "disable")
+        msg.post("#sprite2", "disable")
+        msg.post("#sprite3", "disable")
+    end
+end
+
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("bonus_id") then
+        if message.bonus_index == 1 then
+            msg.post("#sprite", "disable")
+            go.set("#sprite", "image", self.increase_icon)
+        elseif message.bonus_index == 2 then
+            msg.post("#sprite", "disable")
+            go.set("#sprite", "image", self.decrease_icon)
+        elseif message.bonus_index == 3 then
+            msg.post("#sprite", "disable")
+            go.set("#sprite", "image", self.lap_icon)
+        elseif message.bonus_index == 4 then
+            msg.post("#sprite", "disable")
+            go.set("#sprite", "image", self.get_stuck_icon)
+        elseif message.bonus_index == 5 then
+            msg.post("#sprite", "disable")
+            go.set("#sprite", "image", self.rocket_icon)
+        end
+    end
+end

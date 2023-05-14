@@ -1,8 +1,6 @@
 go.property("target", 0)
 go.property("speed", 10)
 
-local car
-
 local car_1 = hash("/go1")
 local car_2 = hash("/go2")
 
@@ -10,15 +8,15 @@ function init(self)
     if self.target == 0 then
         return
     elseif self.target == 1 then
-        car = hash(car_1)
+        self.car = hash(car_1)
     elseif self.target == 2 then
-        car = hash(car_2)
+        self.car = hash(car_2)
     end
 end
 
 function update(self, dt)
     if self.target == 0 then return end
-    local target_position = go.get_position(car)
+    local target_position = go.get_position(self.car)
     local current_position = go.get_position(".")
     local angle = math.atan2(current_position.x - target_position.x, target_position.y - current_position.y)
     go.set_rotation(vmath.quat_rotation_z(angle), ".")

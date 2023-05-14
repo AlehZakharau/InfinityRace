@@ -19,6 +19,26 @@ instances {
     z: 1.0
   }
 }
+instances {
+  id: "factory_bonus"
+  prototype: "/main/factory_bonus.go"
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
 scale_along_z: 0
 embedded_instances {
   id: "go"
@@ -35,6 +55,16 @@ embedded_instances {
   "    y: 0.0\n"
   "    z: 0.0\n"
   "    w: 1.0\n"
+  "  }\n"
+  "  properties {\n"
+  "    id: \"car_speed\"\n"
+  "    value: \"100.0\"\n"
+  "    type: PROPERTY_TYPE_NUMBER\n"
+  "  }\n"
+  "  properties {\n"
+  "    id: \"max_track_speed\"\n"
+  "    value: \"3.0\"\n"
+  "    type: PROPERTY_TYPE_NUMBER\n"
   "  }\n"
   "  property_decls {\n"
   "  }\n"
@@ -62,8 +92,8 @@ embedded_instances {
   data: "embedded_components {\n"
   "  id: \"sprite\"\n"
   "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/assets/track.atlas\\\"\\n"
-  "default_animation: \\\"car\\\"\\n"
+  "  data: \"tile_set: \\\"/assets/cars.atlas\\\"\\n"
+  "default_animation: \\\"car_1\\\"\\n"
   "material: \\\"/builtins/materials/sprite.material\\\"\\n"
   "blend_mode: BLEND_MODE_ALPHA\\n"
   "\"\n"
@@ -102,8 +132,8 @@ embedded_instances {
   data: "embedded_components {\n"
   "  id: \"sprite\"\n"
   "  type: \"sprite\"\n"
-  "  data: \"tile_set: \\\"/assets/track.atlas\\\"\\n"
-  "default_animation: \\\"circle\\\"\\n"
+  "  data: \"tile_set: \\\"/assets/cars.atlas\\\"\\n"
+  "default_animation: \\\"car_6\\\"\\n"
   "material: \\\"/builtins/materials/sprite.material\\\"\\n"
   "blend_mode: BLEND_MODE_ALPHA\\n"
   "\"\n"
@@ -118,10 +148,87 @@ embedded_instances {
   "    z: 0.0\n"
   "    w: 1.0\n"
   "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "track"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"tile_set: \\\"/assets/track.atlas\\\"\\n"
+  "default_animation: \\\"track\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "blend_mode: BLEND_MODE_ALPHA\\n"
+  "\"\n"
+  "  position {\n"
+  "    x: 428.0\n"
+  "    y: 265.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
   "  scale {\n"
-  "    x: 0.25\n"
-  "    y: 0.25\n"
-  "    z: 0.25\n"
+  "    x: 0.5\n"
+  "    y: 0.5\n"
+  "    z: 1.0\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 8.0
+    y: 19.0
+    z: -0.4
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+  scale3 {
+    x: 1.0
+    y: 1.0
+    z: 1.0
+  }
+}
+embedded_instances {
+  id: "icons"
+  data: "components {\n"
+  "  id: \"car_icons\"\n"
+  "  component: \"/main/car_icons.script\"\n"
+  "  position {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "  }\n"
+  "  rotation {\n"
+  "    x: 0.0\n"
+  "    y: 0.0\n"
+  "    z: 0.0\n"
+  "    w: 1.0\n"
+  "  }\n"
+  "  property_decls {\n"
   "  }\n"
   "}\n"
   ""

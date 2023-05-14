@@ -1,37 +1,37 @@
 images {
-  image: "/assets/circle.png"
+  image: "/assets/car_1.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/car.png"
+  image: "/assets/car_2.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/track.png"
+  image: "/assets/car_3.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/rocket.png"
+  image: "/assets/car_4.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/decrease_icon.png"
+  image: "/assets/car_5.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/get_stuck_icon.png"
+  image: "/assets/car_6.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/increase_icon.png"
+  image: "/assets/car_7.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/lap_icon.png"
+  image: "/assets/car_8.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/rocket_icon.png"
+  image: "/assets/car_9.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 margin: 0

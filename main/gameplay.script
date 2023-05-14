@@ -16,7 +16,7 @@ local car_1 = "/go1"
 local car_2 = "/go2"
 
 local track_1, track_2 = {}, {}
-local index_1, index_2 = 1, 100
+local index_1, index_2 = 1, 1
 local lap_index_1, lap_index_2 = 1, 1
 local track_speed
 local time = 0
@@ -42,11 +42,13 @@ local function activate_track_speed_timer(self)
 	end)
 end
 
-local function spawn_bonus()
-	return math.random(1, 5)
+local function spawn_bonus(position, self)
+	local bonus = math.random(1, 5)
+	local bonus_id = factory.create("/factory_bonus#foctory_bonus", position, nil, {bonus_index = bonus})
+	return bonus, bonus_id
 end
 
-local function initialize_track(track, path)
+local function initialize_track(track, path, self)
 	local data = sys.load_resource(path)
 	for line in data:gmatch(line_match_pattern) do
 		local a, x, y, switcher_status, connector_index, bonus_status = line:match(match_pattern)
@@ -54,28 +56,27 @@ local function initialize_track(track, path)
 		track[id] = {position = vmath.vector3(x, y, 0), switcher = tonumber(switcher_status),
 					 connector = tonumber(connector_index), bonus = tonumber(bonus_status)}
 		if tonumber(bonus_status) == 1 then
-			track[id].bonus = spawn_bonus()
+			track[id].bonus, track[id].bonus_id = spawn_bonus(track[id].position, self)
 		end
 	end
 end
 
-local function initialize_tracks()
-	--local path = file_path .. file_track_1_name
-	initialize_track(track_1, file_track_1_name)
+local function initialize_tracks(self)
+	initialize_track(track_1, file_track_1_name, self)
 	current_track_car_1 = track_1
 	current_track_index_1 = 1
-	--path = file_path .. file_track_2_name
-	initialize_track(track_2, file_track_2_name)
+	initialize_track(track_2, file_track_2_name, self)
 	current_track_car_2 = track_2
 	current_track_index_2 = 2
 end
 
 function init(self)
+	math.randomseed(os.time())
 	track_speed = self.track_speed
 	car_1_speed, car_2_speed = self.car_speed, self.car_speed
 	boost_speed, boost_delay, boost_duration = self.boost_speed, self.boost_delay, self.boost_duration
 
-	initialize_tracks()
+	initialize_tracks(self)
 	activate_track_speed_timer(self)
 
 	msg.post(".", "acquire_input_focus")
@@ -176,9 +177,15 @@ local function car_1_callback()
 
 		if current_track_car_1[index_1].bonus > 0 then
 			activate_boost(current_track_car_1[index_1].bonus, car_index_1)
+			go.delete(current_track_car_1[index_1].bonus_id)
 			bonus_respawn_index_1 = index_1
 			current_track_car_1[index_1].bonus = 0
-			timer.delay(5, false, function() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end)
+			timer.delay(5, false, function()
+				local bonus = math.random(1, 5)
+				local id = factory.create("/factory_bonus#foctory_bonus", current_track_car_1[bonus_respawn_index_1].position, nil, {bonus_index = bonus})
+				current_track_car_1[bonus_respawn_index_1].bonus = bonus
+				current_track_car_1[bonus_respawn_index_1].bonus_id = id
+			end)
 		end
 	end
 end
@@ -192,9 +199,15 @@ local function car_2_callback()
 		end
 		if current_track_car_2[index_2].bonus > 0 then
 			activate_boost(current_track_car_2[index_2].bonus, car_index_2)
+			go.delete(current_track_car_2[index_2].bonus_id)
 			bonus_respawn_index_2 = index_2
 			current_track_car_2[index_2].bonus = 0
-			timer.delay(5, false, function() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end)
+			timer.delay(5, false, function()
+				local bonus = math.random(1, 5)
+				local id = factory.create("/factory_bonus#foctory_bonus", current_track_car_2[bonus_respawn_index_2].position, nil, {bonus_index = bonus})
+				current_track_car_2[bonus_respawn_index_2].bonus = bonus
+				current_track_car_2[bonus_respawn_index_2].bonus_id = id
+			end)
 		end
 	end
 end
