@@ -16,9 +16,11 @@ local car_2 = "/go2"
 
 local track_1, track_2 = {}, {}
 local index_1, index_2 = 1, 100
+local lap_index_1, lap_index_2 = 1, 1
 local track_speed
 local time = 0
 
+local car_index_1, car_index_2 = 1, 2
 local car_1_moved, car_2_moved = true, true
 local car_1_active, car_2_active = false, false
 local car_1_speed, car_2_speed
@@ -90,15 +92,76 @@ local function check_car_position()
 	end
 end
 
+local function disable_car_2()
+	car_2_active = false
+	car_2_moved = true
+	timer.delay(3, false, function() car_2_active = true end)
+end
+
+local function disable_car_1()
+	car_1_active = false
+	car_1_moved = true
+	timer.delay(3, false, function() car_1_active = true end)
+end
+
+local function change_car_speed(car_speed, sign)
+	return car_speed + sign * car_speed * 0.25
+end
+
+local current_speed_1, current_speed_2
+
+local function speed_bonus(car_index, sign)
+	if car_index == 1 then
+		current_speed_1 = car_1_speed
+		car_1_speed = change_car_speed(car_1_speed, sign)
+		timer.delay(3, false, function() car_1_speed = current_speed_1 end)
+	else
+		current_speed_2 = car_2_speed
+		car_2_speed = change_car_speed(car_2_speed, sign)
+		timer.delay(3, false, function() car_2_speed = current_speed_2 end)
+	end
+end
+
+local function lap_bonus(car_index)
+	if car_index == 1 then
+		lap_index_1 = lap_index_1 + 1
+	else
+		lap_index_2 = lap_index_2 + 1
+	end
+end
+
+local function get_stuck_bonus(car_index)
+	if car_index == 1 then
+		disable_car_1()
+	else
+		disable_car_2()
+	end
+end
+
+
+local function activate_boost(boost_number, car_index)
+	if boost_number == 1 then
+		speed_bonus(car_index, 1)
+	elseif boost_number == 2 then
+		speed_bonus(car_index, -1)
+	elseif boost_number == 3 then
+		lap_bonus(car_index)
+	elseif boost_number == 4 then
+		get_stuck_bonus(car_index)
+	elseif boost_number == 5 then
+		-- random position
+		factory.create("/factory_rocket#factory_rocket", nil, nil, {target = car_index})
+	end
+end
+
 local function car_1_callback()
 	if car_1_active == true then
 		car_1_moved = true
 		if check_car_position() == true  and index_1 < index_2 and car_1_active == true then
-			car_2_active = false
-			car_2_moved = true
-			timer.delay(3, false, function() car_2_active = true end)
+			disable_car_2()
 		end
 		if current_track_car_1[index_1].bonus > 0 then
+			activate_boost(current_track_index_1[index_1].bonus, car_index_1)
 			bonus_respawn_index_1 = index_1
 			current_track_car_1[index_1].bonus = 0
 			timer.delay(3, false, function() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end)
@@ -106,22 +169,19 @@ local function car_1_callback()
 		end
 	end
 end
+
+
 local function car_2_callback()
 	if car_2_active == true then
 		car_2_moved = true
-		if check_car_position() == true  and index_1 > index_2 and car_2_active == true then
-			car_1_active = false
-			car_1_moved = true
-			timer.delay(3, false, function()
-				car_1_active = true
-			end)
+		if check_car_position() == true and index_1 > index_2 and car_2_active == true then
+			disable_car_1()
 		end
-		if current_track_car_2[index_2].bonus == 1 then
+		if current_track_car_2[index_2].bonus > 0 then
+			activate_boost(current_track_index_2[index_2].bonus, car_index_2)
 			bonus_respawn_index_2 = index_2
 			current_track_car_2[index_2].bonus = 0
-			timer.delay(3, false, function()
-				current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus()
-			end)
+			timer.delay(3, false, function() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end)
 			print("bonus")
 		end
 	end
@@ -132,6 +192,14 @@ local function increment_index(index, track_length, current_track_speed)
 	if next_index > track_length then next_index = 1 end
 	return next_index
 end
+local function increment_index_and_lap(index, lap_index, track_length, current_track_speed)
+	local next_index = index + current_track_speed
+	if next_index > track_length then
+		next_index = 1
+		lap_index = lap_index + 1
+	end
+	return next_index, lap_index
+end
 
 local function rotate_car(car, track, index, current_track_speed)
 	local current_position = go.get_position(car)
@@ -141,14 +209,14 @@ local function rotate_car(car, track, index, current_track_speed)
 	go.set_rotation(vmath.quat_rotation_z(angle), car)
 end
 
-local function move_car(track, index, car, current_track_speed, car_speed, callback)
+local function move_car(track, index, lap_index, car, current_track_speed, car_speed, callback)
 	local current_position = track[index].position
-	local next_index = increment_index(index, #track, current_track_speed)
+	local next_index, current_lap = increment_index_and_lap(index, lap_index, #track, current_track_speed)
 	local target_position = track[next_index].position
 	local distance = vmath.length(target_position - current_position)
 	local duration = distance / car_speed
 	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0, callback)
-	return next_index
+	return next_index, current_lap
 end
 
 
@@ -173,17 +241,27 @@ function update(self, dt)
 	time = time + dt
 	if car_1_moved == true and car_1_active == true then
 		car_1_moved = false
-		index_1 = move_car(current_track_car_1, index_1, car_1, track_speed, car_1_speed, car_1_callback)
+		index_1, lap_index_1 = move_car(current_track_car_1, index_1, lap_index_1, car_1, track_speed, car_1_speed, car_1_callback)
 	end
 	if car_2_moved == true and car_2_active == true then
 		car_2_moved = false
-		index_2 = move_car(current_track_car_2, index_2, car_2, track_speed, car_2_speed, car_2_callback)
+		index_2, lap_index_2 = move_car(current_track_car_2, index_2, lap_index_2, car_2, track_speed, car_2_speed, car_2_callback)
 	end
 	if car_1_active == true then
 		rotate_car(car_1, current_track_car_1, index_1, track_speed)
 	end
 	if car_2_active == true then
 		rotate_car(car_2, current_track_car_2, index_2, track_speed)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("hit") then
+		if message.target == 1 then
+			disable_car_1()
+		else
+			disable_car_2()
+		end
 	end
 end
 
