@@ -3,16 +3,16 @@ go.property("speed", 10)
 
 local car
 
-local car_1 = "/go1"
-local car_2 = "/go2"
+local car_1 = hash("/go1")
+local car_2 = hash("/go2")
 
 function init(self)
     if self.target == 0 then
         return
     elseif self.target == 1 then
-        car = car_1
+        car = hash(car_1)
     elseif self.target == 2 then
-        car = car_2
+        car = hash(car_2)
     end
 end
 
@@ -24,8 +24,11 @@ function update(self, dt)
     go.set_rotation(vmath.quat_rotation_z(angle), ".")
     local distance = vmath.length(target_position - current_position) -- <6>
     local duration =  distance / self.speed
-    go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0, function()
-        msg.post(car, "hit")
+    go.animate(".", "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0, function()
+        print("found target")
+        msg.post("/go#test", "hit", {target = self.target})
         go.delete(".")
     end)
+    --print("rocket: "..current_position)
+    --print("target: "..target_position)
 end

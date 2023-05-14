@@ -10,7 +10,7 @@ go.property("boost_delay", 3)
 local file_track_1_name = "/data/track_1.txt"
 local file_track_2_name = "/data/track_2.txt"
 local line_match_pattern = "([^\n]+)"
-local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)"
+local match_pattern = "([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)"
 
 local car_1 = "/go1"
 local car_2 = "/go2"
@@ -138,19 +138,32 @@ local function get_stuck_bonus(car_index)
 	end
 end
 
+local function launch_rocket(car_index)
+	local position = vmath.vector3(0, 0, 0)
+	if car_index == 1 then
+		factory.create("/factory_rocket#factory_rocket", position, nil, {target = 2})
+	else
+		factory.create("/factory_rocket#factory_rocket", position, nil, {target = 1})
+	end
+end
+
 
 local function activate_boost(boost_number, car_index)
 	if boost_number == 1 then
+		print("Bonus: Increase speed")
 		speed_bonus(car_index, 1)
 	elseif boost_number == 2 then
+		print("Bonus: Decrease speed")
 		speed_bonus(car_index, -1)
 	elseif boost_number == 3 then
+		print("Bonus: Add lap")
 		lap_bonus(car_index)
 	elseif boost_number == 4 then
+		print("Bonus: get stuck")
 		get_stuck_bonus(car_index)
 	elseif boost_number == 5 then
-		-- random position
-		factory.create("/factory_rocket#factory_rocket", nil, nil, {target = car_index})
+		print("Bonus: launch rocket")
+		launch_rocket(car_index)
 	end
 end
 
@@ -160,12 +173,12 @@ local function car_1_callback()
 		if check_car_position() == true  and index_1 < index_2 and car_1_active == true then
 			disable_car_2()
 		end
+
 		if current_track_car_1[index_1].bonus > 0 then
-			activate_boost(current_track_index_1[index_1].bonus, car_index_1)
+			activate_boost(current_track_car_1[index_1].bonus, car_index_1)
 			bonus_respawn_index_1 = index_1
 			current_track_car_1[index_1].bonus = 0
-			timer.delay(3, false, function() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end)
-			print("bonus")
+			timer.delay(5, false, function() current_track_car_1[bonus_respawn_index_1].bonus = spawn_bonus() end)
 		end
 	end
 end
@@ -178,11 +191,10 @@ local function car_2_callback()
 			disable_car_1()
 		end
 		if current_track_car_2[index_2].bonus > 0 then
-			activate_boost(current_track_index_2[index_2].bonus, car_index_2)
+			activate_boost(current_track_car_2[index_2].bonus, car_index_2)
 			bonus_respawn_index_2 = index_2
 			current_track_car_2[index_2].bonus = 0
-			timer.delay(3, false, function() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end)
-			print("bonus")
+			timer.delay(5, false, function() current_track_car_2[bonus_respawn_index_2].bonus = spawn_bonus() end)
 		end
 	end
 end

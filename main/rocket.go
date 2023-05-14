@@ -12,4 +12,9 @@ components {
     z: 0.0
     w: 1.0
   }
+  properties {
+    id: "speed"
+    value: "100.0"
+    type: PROPERTY_TYPE_NUMBER
+  }
 }
