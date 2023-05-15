@@ -111,6 +111,7 @@ local function check_car_position()
 end
 
 local function disable_car_2()
+	sound.play("/sound#get_stuck")
 	data.score_2 = data.score_2 - 25
 	msg.post("/ui#ui", "update_score")
 	car_2_active = false
@@ -119,6 +120,7 @@ local function disable_car_2()
 end
 
 local function disable_car_1()
+	sound.play("/sound#get_stuck")
 	data.score_1 = data.score_1 - 25
 	msg.post("/ui#ui", "update_score")
 	car_1_active = false
@@ -159,7 +161,6 @@ local function lap_bonus(car_index)
 end
 
 local function get_stuck_bonus(car_index)
-	sound.play("/sound#get_stuck")
 	if car_index == 1 then
 		disable_car_1()
 	else
@@ -361,7 +362,6 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("hit") then
-		sound.play("/sound#get_stuck")
 		if message.target == 1 then
 			disable_car_1()
 		else
