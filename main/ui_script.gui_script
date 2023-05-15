@@ -9,8 +9,15 @@ local boost_2
 local turn_1
 local turn_2
 
-local data = require("main/data")
 
+local tutorial_1
+local tutorial_2
+local tutorial_3
+local tutorial_4
+
+local leader_icon
+
+local data = require("main/data")
 
 function init(self)
     msg.post(".", "acquire_input_focus")
@@ -24,6 +31,20 @@ function init(self)
     boost_2 = gui.get_node("boost_button_2")
     turn_1 = gui.get_node("turn_button_1")
     turn_2 = gui.get_node("turn_button_2")
+
+    tutorial_1 = gui.get_node("tutorial_1")
+    tutorial_2 = gui.get_node("tutorial_2")
+    tutorial_3 = gui.get_node("tutorial_3")
+    tutorial_4 = gui.get_node("tutorial_4")
+
+    leader_icon = gui.get_node("leader")
+
+    timer.delay(10, false, function()
+        gui.set_enabled(tutorial_1, false)
+        gui.set_enabled(tutorial_2, false)
+        gui.set_enabled(tutorial_3, false)
+        gui.set_enabled(tutorial_4, false)
+    end)
 end
 
 local second = 0
@@ -43,7 +64,10 @@ function update(self, dt)
         minutes = minutes + 1
         second = 0
     end
-    gui.set_text(time, minutes..":"..second)
+    local second_text = second
+    if second < 10 then second_text = "0"..second_text end
+    local text = minutes..":"..second_text
+    gui.set_text(time, text)
 end
 
 function on_message(self, message_id, message, sender)
@@ -55,17 +79,28 @@ function on_message(self, message_id, message, sender)
         gui.set_text(score_1, data.score_1)
         gui.set_text(score_2, data.score_2)
     end
+    if message_id == hash("move_leader_icon") then
+        if message.direction == 2 then
+            gui.animate(leader_icon, "position.x", 800, go.EASING_OUTQUAD, 2)
+        else
+            gui.animate(leader_icon, "position.x", 100, go.EASING_OUTQUAD, 2)
+        end
+    end
 end
 
 function on_input(self, action_id, action)
     if action_id == hash("touch") and action.pressed then
         if gui.pick_node(boost_1, action.x, action.y) then
+            sound.play("/sound#digital_hit")
             msg.post("/go#test", "boost_car_1")
         elseif gui.pick_node(boost_2, action.x, action.y) then
+            sound.play("/sound#digital_hit")
             msg.post("/go#test", "boost_car_2")
         elseif gui.pick_node(turn_1, action.x, action.y) then
+            sound.play("/sound#digital_hit")
             msg.post("/go#test", "switch_track_1")
         elseif gui.pick_node(turn_2, action.x, action.y) then
+            sound.play("/sound#digital_hit")
             msg.post("/go#test", "switch_track_2")
         end
     end

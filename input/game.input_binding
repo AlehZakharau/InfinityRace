@@ -1,13 +1,13 @@
 key_trigger {
-  input: KEY_SPACE
+  input: KEY_M
   action: "boost_car_1"
 }
 key_trigger {
-  input: KEY_G
+  input: KEY_N
   action: "switch_track_1"
 }
 key_trigger {
-  input: KEY_F
+  input: KEY_X
   action: "switch_track_2"
 }
 key_trigger {

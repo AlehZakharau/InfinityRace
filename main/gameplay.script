@@ -29,8 +29,15 @@ local boost_duration
 local boost_speed
 local boost_1, boost_2 = false, false
 
+local label_status = true
+local leader_icon = 0
+
 local current_track_car_1, current_track_car_2
 local current_track_index_1, current_track_index_2
+
+--------------------------------------------------------
+-- -- -- INITIALIZE -- -- --
+--------------------------------------------------------
 
 local function activate_track_speed_timer(self)
 	timer.delay(self.track_stage_duration, true, function()
@@ -83,9 +90,17 @@ function init(self)
 
 	msg.post(".", "acquire_input_focus")
 	car_1_active, car_2_active = true, true
+
+	timer.delay(15, false, function()
+		label_status = false
+		go.delete("/car_label_1")
+		go.delete("/car_label_2")
+	end)
 end
 
-local bonus_respawn_index_1, bonus_respawn_index_2
+--------------------------------------------------------
+-- -- -- BONUSES -- -- --
+--------------------------------------------------------
 
 local function check_car_position()
 	if current_track_index_1 == current_track_index_2 and math.abs(index_1 - index_2) < 2 then
@@ -200,7 +215,7 @@ local function car_1_callback()
 		if current_track_car_1[index_1].bonus > 0 then
 			activate_boost(current_track_car_1[index_1].bonus, car_index_1)
 			go.delete(current_track_car_1[index_1].bonus_id)
-			bonus_respawn_index_1 = index_1
+			local bonus_respawn_index_1 = index_1
 			current_track_car_1[index_1].bonus = 0
 			timer.delay(1, false, function()
 				local bonus = math.random(1, 5)
@@ -222,7 +237,7 @@ local function car_2_callback()
 		if current_track_car_2[index_2].bonus > 0 then
 			activate_boost(current_track_car_2[index_2].bonus, car_index_2)
 			go.delete(current_track_car_2[index_2].bonus_id)
-			bonus_respawn_index_2 = index_2
+			local bonus_respawn_index_2 = index_2
 			current_track_car_2[index_2].bonus = 0
 			timer.delay(1, false, function()
 				local bonus = math.random(1, 5)
@@ -257,13 +272,14 @@ local function rotate_car(car, track, index)
 	go.set_rotation(vmath.quat_rotation_z(angle), car)
 end
 
-local function move_car(track, index, lap_index, car, speed, callback)
+local function move_car(track, index, lap_index, car, speed, callback, car_label)
 	local current_position = track[index].position
 	local next_index, current_lap = increment_index_and_lap(index, lap_index, #track)
 	local target_position = track[next_index].position
 	local distance = vmath.length(target_position - current_position)
 	local duration = distance / speed
 	go.animate(car, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0, callback)
+	if label_status == true then go.animate(car_label, "position", go.PLAYBACK_ONCE_FORWARD, target_position, go.EASING_LINEAR, duration, 0) end
 	return next_index, current_lap
 end
 
@@ -293,11 +309,11 @@ function update(self, dt)
 	score_timer = score_timer + dt
 	if car_1_moved == true and car_1_active == true then
 		car_1_moved = false
-		index_1, data.lap_index_1 = move_car(current_track_car_1, index_1, data.lap_index_1, car_1, car_1_speed, car_1_callback)
+		index_1, data.lap_index_1 = move_car(current_track_car_1, index_1, data.lap_index_1, car_1, car_1_speed, car_1_callback, "car_label_1")
 	end
 	if car_2_moved == true and car_2_active == true then
 		car_2_moved = false
-		index_2, data.lap_index_2 = move_car(current_track_car_2, index_2, data.lap_index_2, car_2, car_2_speed, car_2_callback)
+		index_2, data.lap_index_2 = move_car(current_track_car_2, index_2, data.lap_index_2, car_2, car_2_speed, car_2_callback, "/car_label_2")
 	end
 	if car_1_active == true then
 		rotate_car(car_1, current_track_car_1, index_1)
@@ -309,10 +325,18 @@ function update(self, dt)
 		score_timer = 0
 		if data.lap_index_1 > data.lap_index_2 or index_1 > index_2 and data.lap_index_1 > data.lap_index_2
 		or index_1 > index_2  and data.lap_index_1 == data.lap_index_2 then
+			if leader_icon == 0 or leader_icon == 2 then
+				leader_icon = 1
+				msg.post("/ui#ui", "move_leader_icon", {direction = 1})
+			end
 			data.score_1 = data.score_1 + 1
 			msg.post("/ui#ui", "update_score")
 		elseif data.lap_index_1 < data.lap_index_2 or index_2 > index_1 and data.lap_index_2 > data.lap_index_1
 		or index_2 > index_1 and data.lap_index_1 == data.lap_index_2 then
+			if leader_icon == 0 or leader_icon == 1 then
+				leader_icon = 2
+				msg.post("/ui#ui", "move_leader_icon", {direction = 2})
+			end
 			data.score_2 = data.score_2 + 1
 			msg.post("/ui#ui", "update_score")
 		end
