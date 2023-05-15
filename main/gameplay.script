@@ -72,6 +72,8 @@ local function initialize_tracks()
 end
 
 function init(self)
+	sound.play("/sound#car_track")
+	sound.play("/sound#high_speed")
 	math.randomseed(os.time())
 	car_1_speed, car_2_speed, car_speed = self.car_speed, self.car_speed, self.car_speed
 	boost_speed, boost_delay, boost_duration = self.boost_speed, self.boost_delay, self.boost_duration
@@ -142,6 +144,7 @@ local function lap_bonus(car_index)
 end
 
 local function get_stuck_bonus(car_index)
+	sound.play("/sound#get_stuck")
 	if car_index == 1 then
 		disable_car_1()
 	else
@@ -151,6 +154,7 @@ end
 
 local function launch_rocket(car_index)
 	local position = vmath.vector3(0, 200, 0)
+	sound.play("/sound#rocket")
 	if car_index == 1 then
 		data.score_1 = data.score_1 + 50
 		msg.post("/ui#ui", "update_score")
@@ -165,13 +169,16 @@ end
 
 local function activate_boost(boost_number, car_index)
 	if boost_number == 1 then
+		sound.play("/sound#speed_boost")
 		print("Bonus: Increase speed")
 		speed_bonus(car_index, 1)
 	elseif boost_number == 2 then
+		sound.play("/sound#slowdown")
 		print("Bonus: Decrease speed")
 		speed_bonus(car_index, -1)
 	elseif boost_number == 3 then
 		print("Bonus: Add lap")
+		sound.play("/sound#lap_bonus")
 		lap_bonus(car_index)
 	elseif boost_number == 4 then
 		print("Bonus: get stuck")
@@ -181,6 +188,7 @@ local function activate_boost(boost_number, car_index)
 		launch_rocket(car_index)
 	end
 end
+
 
 local function car_1_callback()
 	if car_1_active == true then
@@ -262,6 +270,7 @@ end
 
 local function switch_track(track, index, track_index)
 	if track[index].switcher == 1 then
+		sound.play("/sound#switch_track")
 		if track_index == 1 then
 			index = track[index].connector
 			track = track_2
@@ -318,6 +327,7 @@ local function end_speed_boost_2() car_2_speed = car_2_speed / boost_speed end
 
 
 local function boost(speed, boost_status, boost_callback, enable_boost_callback)
+	sound.play("/sound#speed_boost")
 	speed = speed * boost_speed
 	boost_status = true
 	timer.delay(boost_duration, false, boost_callback)
@@ -327,6 +337,7 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("hit") then
+		sound.play("/sound#get_stuck")
 		if message.target == 1 then
 			disable_car_1()
 		else
