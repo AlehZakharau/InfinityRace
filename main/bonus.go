@@ -32,6 +32,11 @@ embedded_components {
     z: 0.0
     w: 1.0
   }
+  scale {
+    x: 0.08
+    y: 0.08
+    z: 1.0
+  }
 }
 embedded_components {
   id: "sprite1"
@@ -51,6 +56,11 @@ embedded_components {
     y: 0.0
     z: 0.0
     w: 1.0
+  }
+  scale {
+    x: 0.08
+    y: 0.08
+    z: 1.0
   }
 }
 embedded_components {
@@ -72,6 +82,11 @@ embedded_components {
     z: 0.0
     w: 1.0
   }
+  scale {
+    x: 0.08
+    y: 0.08
+    z: 1.0
+  }
 }
 embedded_components {
   id: "sprite3"
@@ -92,6 +107,11 @@ embedded_components {
     z: 0.0
     w: 1.0
   }
+  scale {
+    x: 0.08
+    y: 0.08
+    z: 1.0
+  }
 }
 embedded_components {
   id: "sprite4"
@@ -111,5 +131,10 @@ embedded_components {
     y: 0.0
     z: 0.0
     w: 1.0
+  }
+  scale {
+    x: 0.08
+    y: 0.08
+    z: 1.0
   }
 }
