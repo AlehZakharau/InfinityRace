@@ -14,7 +14,7 @@ components {
   }
   properties {
     id: "speed"
-    value: "250.0"
+    value: "550.0"
     type: PROPERTY_TYPE_NUMBER
   }
 }

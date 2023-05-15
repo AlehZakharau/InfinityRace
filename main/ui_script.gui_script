@@ -1,0 +1,72 @@
+local score_1
+local score_2
+local lap_1
+local lap_2
+local time
+
+local boost_1
+local boost_2
+local turn_1
+local turn_2
+
+local data = require("main/data")
+
+
+function init(self)
+    msg.post(".", "acquire_input_focus")
+	score_1 = gui.get_node("score")
+	score_2 = gui.get_node("score1")
+    lap_1 = gui.get_node("lap")
+    lap_2 = gui.get_node("lap1")
+    time = gui.get_node("time")
+
+    boost_1 = gui.get_node("boost_button_1")
+    boost_2 = gui.get_node("boost_button_2")
+    turn_1 = gui.get_node("turn_button_1")
+    turn_2 = gui.get_node("turn_button_2")
+end
+
+local second = 0
+local minutes = 0
+local timer_second = 0
+local timer_minute = 0
+function update(self, dt)
+    timer_second = timer_second + dt
+    timer_minute = timer_minute + dt
+    if timer_second > 1 then
+        timer_second = 0
+        second = second + 1
+    end
+    if timer_minute > 60 then
+        timer_minute = 0
+        timer_second = 0
+        minutes = minutes + 1
+        second = 0
+    end
+    gui.set_text(time, minutes..":"..second)
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("update_lap") then
+        gui.set_text(lap_1, data.lap_index_1)
+        gui.set_text(lap_2, data.lap_index_2)
+    end
+    if message_id == hash("update_score") then
+        gui.set_text(score_1, data.score_1)
+        gui.set_text(score_2, data.score_2)
+    end
+end
+
+function on_input(self, action_id, action)
+    if action_id == hash("touch") and action.pressed then
+        if gui.pick_node(boost_1, action.x, action.y) then
+            msg.post("/go#test", "boost_car_1")
+        elseif gui.pick_node(boost_2, action.x, action.y) then
+            msg.post("/go#test", "boost_car_2")
+        elseif gui.pick_node(turn_1, action.x, action.y) then
+            msg.post("/go#test", "switch_track_1")
+        elseif gui.pick_node(turn_2, action.x, action.y) then
+            msg.post("/go#test", "switch_track_2")
+        end
+    end
+end
