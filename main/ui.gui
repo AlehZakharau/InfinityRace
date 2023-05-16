@@ -49,8 +49,8 @@ nodes {
   text: "Car 1"
   font: "uni_sans"
   id: "car_labe"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -115,8 +115,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "score_label"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -181,8 +181,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "score"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_W
   outline {
     x: 1.0
@@ -246,8 +246,8 @@ nodes {
   text: "Lap:"
   font: "uni_sans"
   id: "lap_label"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -312,8 +312,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "lap"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_W
   outline {
     x: 1.0
@@ -377,8 +377,8 @@ nodes {
   text: "Car 2"
   font: "uni_sans"
   id: "car_labe1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -443,8 +443,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "score_label1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -509,8 +509,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "score1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_W
   outline {
     x: 1.0
@@ -574,8 +574,8 @@ nodes {
   text: "Lap:"
   font: "uni_sans"
   id: "lap_label1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -640,8 +640,8 @@ nodes {
   ""
   font: "uni_sans"
   id: "lap1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_W
   outline {
     x: 1.0
@@ -706,7 +706,7 @@ nodes {
   font: "uni_sans"
   id: "time"
   xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -769,8 +769,8 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   texture: "track/racing"
   id: "boost_button_1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
   layer: ""
@@ -959,8 +959,8 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   texture: "track/steering-wheel"
   id: "turn_button_1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
   layer: ""
@@ -1151,8 +1151,8 @@ nodes {
   text: "Press \"M\""
   font: "uni_sans"
   id: "tutorial_1"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -1216,8 +1216,8 @@ nodes {
   text: "Press \"N\""
   font: "uni_sans"
   id: "tutorial_2"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_LEFT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -1281,8 +1281,8 @@ nodes {
   text: "Press \"X\""
   font: "uni_sans"
   id: "tutorial_4"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -1346,8 +1346,8 @@ nodes {
   text: "Press \"Z\""
   font: "uni_sans"
   id: "tutorial_3"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   outline {
     x: 1.0
@@ -1411,7 +1411,7 @@ nodes {
   texture: "track/tyre (1)"
   id: "leader"
   xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  yanchor: YANCHOR_TOP
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
   layer: ""
@@ -1467,8 +1467,8 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   texture: "track/racing"
   id: "boost_button_2"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
   layer: ""
@@ -1657,8 +1657,8 @@ nodes {
   blend_mode: BLEND_MODE_ALPHA
   texture: "track/steering-wheel"
   id: "turn_button_2"
-  xanchor: XANCHOR_NONE
-  yanchor: YANCHOR_NONE
+  xanchor: XANCHOR_RIGHT
+  yanchor: YANCHOR_BOTTOM
   pivot: PIVOT_CENTER
   adjust_mode: ADJUST_MODE_FIT
   layer: ""

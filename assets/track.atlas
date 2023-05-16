@@ -7,10 +7,6 @@ images {
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/track.png"
-  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
-}
-images {
   image: "/assets/rocket.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
@@ -44,6 +40,10 @@ images {
 }
 images {
   image: "/assets/steering-wheel.png"
+  sprite_trim_mode: SPRITE_TRIM_MODE_OFF
+}
+images {
+  image: "/assets/track_1.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 margin: 0
